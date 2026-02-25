@@ -123,6 +123,14 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
     return {}
   }
 
+  /**
+   * Preprocesses messages before sending to the model.
+   * Override in subclasses to inject provider-specific metadata (e.g., cache_control for Anthropic).
+   */
+  protected preprocessMessages(messages: ModelMessage[]): ModelMessage[] {
+    return messages
+  }
+
   public async chat(messages: ModelMessage[], options: CallChatCompletionOptions): Promise<StreamTextResult> {
     try {
       return await this._callChatCompletion(messages, options)
@@ -485,9 +493,10 @@ export default abstract class AbstractAISDKModel implements ModelInterface {
     options: CallChatCompletionOptions<T>,
     callSettings: CallSettings
   ): Promise<StreamTextResult> {
+    const processedMessages = this.preprocessMessages(coreMessages)
     const result = streamText({
       model,
-      messages: coreMessages,
+      messages: processedMessages,
       stopWhen: stepCountIs(options.maxSteps || Number.MAX_SAFE_INTEGER),
       tools: options.tools,
       abortSignal: options.signal,

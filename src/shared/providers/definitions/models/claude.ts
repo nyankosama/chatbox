@@ -1,6 +1,8 @@
 import { type AnthropicProviderOptions, createAnthropic } from '@ai-sdk/anthropic'
+import { wrapLanguageModel } from 'ai'
 import AbstractAISDKModel, { type CallSettings } from '../../../models/abstract-ai-sdk'
 import { ApiError } from '../../../models/errors'
+import { anthropicCacheMiddleware } from '../../../models/utils/anthropic-cache'
 import type { CallChatCompletionOptions } from '../../../models/types'
 import type { ProviderModelInfo } from '../../../types'
 import type { ModelDependencies } from '../../../types/adapters'
@@ -35,7 +37,10 @@ export default class Claude extends AbstractAISDKModel {
 
   protected getChatModel() {
     const provider = this.getProvider()
-    return provider.languageModel(this.options.model.modelId)
+    return wrapLanguageModel({
+      model: provider.languageModel(this.options.model.modelId),
+      middleware: anthropicCacheMiddleware,
+    })
   }
 
   protected getCallSettings(options: CallChatCompletionOptions): CallSettings {

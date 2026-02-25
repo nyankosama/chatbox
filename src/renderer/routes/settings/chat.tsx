@@ -5,6 +5,7 @@ import { createFileRoute } from '@tanstack/react-router'
 import { useMemo } from 'react'
 import { useTranslation } from 'react-i18next'
 import { AssistantAvatar, UserAvatar } from '@/components/common/Avatar'
+import LazyNumberInput from '@/components/common/LazyNumberInput'
 import MaxContextMessageCountSlider from '@/components/common/MaxContextMessageCountSlider'
 import SliderWithInput from '@/components/common/SliderWithInput'
 import { Divider } from '@/components/common/Divider'
@@ -190,6 +191,33 @@ export function RouteComponent() {
 
           <SliderWithInput value={settings?.topP} onChange={(v) => setSettings({ topP: v })} max={1} />
         </Stack>
+
+        <Flex justify="space-between" align="center">
+          <Flex align="center" gap="xs">
+            <Text size="sm">{t('Max Output Tokens')}</Text>
+            <Tooltip
+              label={t(
+                'Set the maximum number of tokens for model output. Please set it within the acceptable range of the model, otherwise errors may occur.'
+              )}
+              withArrow={true}
+              maw={320}
+              className="!whitespace-normal"
+              zIndex={3000}
+              events={{ hover: true, focus: true, touch: true }}
+            >
+              <ScalableIcon icon={IconInfoCircle} size={20} className="text-chatbox-tint-tertiary" />
+            </Tooltip>
+          </Flex>
+          <LazyNumberInput
+            width={96}
+            value={settings?.maxTokens}
+            onChange={(v) => setSettings({ maxTokens: typeof v === 'number' ? v : undefined })}
+            min={0}
+            step={1024}
+            allowDecimal={false}
+            placeholder={t('Not set') || ''}
+          />
+        </Flex>
 
         <Stack gap="xxs">
           <Flex align="center" gap="xs" justify="space-between">
